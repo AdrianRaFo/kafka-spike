@@ -14,12 +14,7 @@
     - [enable.auto.commit](#enableautocommit)
     - [Same *client id* for consumers](#same-client-id-for-consumers)
 - [Run app locally](#run-app-locally)
-- [Resources](#resources)
-  - [General](#general)
-  - [Testing](#testing)
-  - [Best practices and patterns](#best-practices-and-patterns)
-  - [Scala](#scala)
-  - [Examples](#examples)
+
 
 ## Design considerations
 
@@ -131,15 +126,11 @@ Verify kafka is working using [Kafka-rest](https://github.com/confluentinc/kafka
 
 Run consumer and http server
 
+using kafka4s
 ```sh
-  > sbt "runMain com.banno.spike.Main"
+  > sbt kafka4s/run
 ```
 
-Run producer
-
-```sh
-  > sbt "runMain HelloProducerApp"
-```
 
 Click to see [messages](http://localhost:8080/index.html). However, if you prefer you can query using:
 
