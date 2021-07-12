@@ -53,6 +53,7 @@ lazy val kafka4s =
     .in(file("modules/kafka4s"))
     .settings(name := "kafka4s")
     .settings(sharedSettings)
+    .settings(resolvers += "confluent" at "https://packages.confluent.io/maven/")
     .settings(libraryDependencies ++= kafka4sDeps)
     .dependsOn(common)
 
