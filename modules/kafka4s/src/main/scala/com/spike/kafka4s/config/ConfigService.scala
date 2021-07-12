@@ -15,16 +15,9 @@ import org.apache.kafka.clients.admin.NewTopic
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.typelevel.log4cats.Logger
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
 
-trait ConfigService[F[_]] {
-  def primaryHttpServer: BlazeServerBuilder[F]
-  def createHelloTopic: F[TopicName]
-  def createHelloConsumer(logger: Logger[F], messages: Topic[F, Option[Hello.Message]]): Resource[F, Consumer[F, Hello]]
-  def createHelloProducer: Resource[F, Producer[F, Message[Hello.Id, Hello.Message]]]
-  def blockingExecutionContext: Resource[F, ExecutionContextExecutorService]
-}
 object ConfigService {
 
   def impl[F[_]: ConcurrentEffect: Timer: ContextShift]: F[ConfigService[F]] =
@@ -39,7 +32,7 @@ object ConfigService {
         def primaryHttpServer: BlazeServerBuilder[F] =
           BlazeServerBuilder[F](ExecutionContext.global).bindHttp(config.http.port, config.http.host)
 
-        def createHelloTopic: F[TopicName] = {
+        def createHelloTopic: F[String] = {
           val topicName = TopicName(config.kafka.topics.hello)
 
           for {
@@ -48,7 +41,7 @@ object ConfigService {
               .void
             _ <- schemaRegistry.registerKey[Hello.Id](topicName.toString)
             _ <- schemaRegistry.registerValue[Hello.Message](topicName.toString)
-          } yield topicName
+          } yield topicName.toString
         }
 
         def createHelloConsumer(
@@ -68,8 +61,6 @@ object ConfigService {
             .connection[F](config.kafka.server, config.kafka.schemaRegistry, HelloClientId("hello-producer-example"))
             .map(Producer(_, TopicName(config.kafka.topics.hello)))
 
-        def blockingExecutionContext: Resource[F, ExecutionContextExecutorService] =
-          SetupConfig.createFixedThreadPoolExecutionContext(4)
       }
 
 }

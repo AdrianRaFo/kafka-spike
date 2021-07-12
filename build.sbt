@@ -15,6 +15,7 @@ val bm4V = "0.3.1"
 
 val sharedSettings = Seq(
   scalaVersion := "2.13.6",
+  resolvers += "confluent" at "https://packages.confluent.io/maven/",
   addCompilerPlugin("org.typelevel" % "kind-projector"      % kindProjectorV cross CrossVersion.full),
   addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % bm4V)
 )
@@ -29,7 +30,7 @@ val commonDeps =
     "com.github.pureconfig" %% "pureconfig-http4s"   % pureConfigV
   )
 
-val fs2kafkaDeps = Seq("com.github.fd4s" %% "fs2-kafka" % fs2KafkaV)
+val fs2kafkaDeps = Seq("com.github.fd4s" %% "fs2-kafka-vulcan" % fs2KafkaV)
 
 val kafka4sDeps = Seq("com.banno" %% "kafka4s" % kafka4sV)
 
@@ -53,7 +54,6 @@ lazy val kafka4s =
     .in(file("modules/kafka4s"))
     .settings(name := "kafka4s")
     .settings(sharedSettings)
-    .settings(resolvers += "confluent" at "https://packages.confluent.io/maven/")
     .settings(libraryDependencies ++= kafka4sDeps)
     .dependsOn(common)
 
