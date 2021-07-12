@@ -17,8 +17,8 @@ object Consumer {
 
   final case class Connection[F[_], K, V] private (raw: ConsumerApi[F, K, V]) extends AnyVal
 
-  private[this] def toNextMessage[K, V]: ConsumerRecord[K, V] => NextMessage[K, V] =
-    x => NextMessage[K, V](x.key(), x.value())
+  private[this] def toMessage[K, V]: ConsumerRecord[K, V] => Message[K, V] =
+    x => Message[K, V](x.key(), x.value())
 
   def connection[F[_]: Async: ContextShift, K: FromRecord, V: FromRecord](
     broker: BrokerAddress,
@@ -36,25 +36,26 @@ object Consumer {
       )
       .map(Connection.apply)
 
+  //Requires autocommit true
   def atMostOnce[F[_], K, V](
       connection: Connection[F, K, V],
       topicName: TopicName,
-      pollTime: FiniteDuration): Consumer[F, NextMessage[K, V]] =
-    new Consumer[F, NextMessage[K, V]] {
-      def deliveredMessages: Stream[F, NextMessage[K, V]] =
+      pollTime: FiniteDuration): Consumer[F, Message[K, V]] =
+    new Consumer[F, Message[K, V]] {
+      def deliveredMessages: Stream[F, Message[K, V]] =
         Stream
           .eval(connection.raw.subscribe(topicName.toString)) >> connection.raw
           .recordStream(pollTime)
-          .map(toNextMessage)
+          .map(toMessage)
     }
 
   def atLeastOnce[F[_]: Sync, K, V, A](connection: Connection[F, K, V], topicName: TopicName, pollTime: FiniteDuration)(
-      handle: Kleisli[F, NextMessage[K, V], A]): Consumer[F, A] =
+      handle: Kleisli[F, Message[K, V], A]): Consumer[F, A] =
     new Consumer[F, A] {
       def deliveredMessages: Stream[F, A] =
         Stream
           .eval(connection.raw.subscribe(topicName.toString)) >> connection.raw
-          .readProcessCommit(pollTime)(x => handle(toNextMessage(x)))
+          .readProcessCommit(pollTime)(x => handle(toMessage(x)))
     }
 
 }
