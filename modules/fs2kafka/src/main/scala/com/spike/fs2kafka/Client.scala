@@ -2,6 +2,7 @@ package com.spike.fs2kafka
 
 import cats.effect._
 import com.spike.common.hello.HelloProducer
+import com.spike.fs2kafka.config.ConfigService
 import fs2._
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 

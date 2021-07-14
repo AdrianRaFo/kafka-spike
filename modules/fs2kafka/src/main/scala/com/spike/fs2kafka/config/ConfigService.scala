@@ -7,8 +7,8 @@ import com.spike.common.hello._
 import com.spike.common.kafka._
 import com.spike.fs2kafka.kafka.{Consumer, Producer}
 import fs2.concurrent.Topic
+import fs2.kafka.vulcan.{AvroSettings, SchemaRegistryClientSettings}
 import fs2.kafka.{AdminClientSettings, KafkaAdminClient}
-import fs2.kafka.vulcan.{Auth, AvroSettings, SchemaRegistryClientSettings}
 import org.apache.kafka.clients.admin.NewTopic
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.typelevel.log4cats.Logger
@@ -21,7 +21,7 @@ object ConfigService {
   def impl[F[_]: ConcurrentEffect: Timer: ContextShift]: F[ConfigService[F]] =
     for {
       config <- SetupConfig.loadConfig[F]
-      avroSettings = AvroSettings {
+      _ = AvroSettings {
         SchemaRegistryClientSettings[IO](config.kafka.schemaRegistry.uri)
           .withMaxCacheSize(config.kafka.schemaRegistry.cachedSchemasPerSubject)
       }
@@ -36,7 +36,7 @@ object ConfigService {
             AdminClientSettings[F].withBootstrapServers(config.kafka.server.uri)
 
           KafkaAdminClient.resource(adminClientSettings).use {
-            _.createTopic(new NewTopic(config.kafka.topics.hello, 1, 1.toShort))
+            _.createTopic(new NewTopic(config.kafka.topics.hello, 1, 1.toShort)).as(config.kafka.topics.hello)
           }
         }
 
@@ -48,12 +48,15 @@ object ConfigService {
               config.kafka.server,
               //config.kafka.schemaRegistry,
               HelloClientId("hello-consumer-example"),
-              HelloGroupId("hello-consumer-example-group"),config.kafka.topics.hello, 1.second)
+              HelloGroupId("hello-consumer-example-group"),
+              config.kafka.topics.hello,
+              1.second
+            )
 
         def createHelloProducer: Resource[F, Producer[F, Message[Hello.Id, Hello.Message]]] =
           Producer
-            .connection[F](config.kafka.server, config.kafka.schemaRegistry, HelloClientId("hello-producer-example"))
-            .map(Producer(_, config.kafka.topics.hello))
+            .connection[F, Hello.Id, Hello.Message](config.kafka.server, HelloClientId("hello-producer-example"))
+            .map(Producer())
 
       }
 
