@@ -9,7 +9,7 @@ import org.typelevel.log4cats.Logger
 
 trait ConfigService[F[_]] {
   def primaryHttpServer: BlazeServerBuilder[F]
-  def createHelloTopic: F[String]
+  def createHelloTopic(logger: Logger[F]): F[String]
   def createHelloConsumer(logger: Logger[F], messages: Topic[F, Option[Hello.Message]]): Resource[F, Consumer[F, Hello]]
   def createHelloProducer: Resource[F, Producer[F, Message[Hello.Id, Hello.Message]]]
 }

@@ -12,12 +12,12 @@ object Client {
 
   def produce[F[_]: ConcurrentEffect: ContextShift: Timer]: Stream[F, Unit] =
     for {
-      iLogger <- Stream.eval(Slf4jLogger.create[F])
+      logger <- Stream.eval(Slf4jLogger.create[F])
       configService <- Stream.eval(ConfigService.impl[F])
-      _ <- Stream.eval(configService.createHelloTopic)
+      _ <- Stream.eval(configService.createHelloTopic(logger))
       producer <- Stream.resource(configService.createHelloProducer)
       // anotherProducer <- Stream.resource(configService.helloProducer)
-      _ <- HelloProducer.impl[F](producer, iLogger, 2.seconds).sendMessages()
+      _ <- HelloProducer.impl[F](producer, logger, 2.seconds).sendMessages()
       // concurrently (HelloProducer.impl[F](anotherProducer, iLogger, 3.seconds).sendMessages())
     } yield ()
 

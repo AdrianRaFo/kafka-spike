@@ -32,7 +32,7 @@ object ConfigService {
         def primaryHttpServer: BlazeServerBuilder[F] =
           BlazeServerBuilder[F](ExecutionContext.global).bindHttp(config.http.port, config.http.host)
 
-        def createHelloTopic: F[String] = {
+        def createHelloTopic(logger: Logger[F]): F[String] = {
           val topicName = TopicName(config.kafka.topics.hello)
 
           for {
@@ -58,8 +58,11 @@ object ConfigService {
 
         def createHelloProducer: Resource[F, Producer[F, Message[Hello.Id, Hello.Message]]] =
           Producer
-            .connection[F](config.kafka.server, config.kafka.schemaRegistry, HelloClientId("hello-producer-example"))
-            .map(Producer(_, TopicName(config.kafka.topics.hello)))
+            .connection[F, Hello.Id, Hello.Message](
+              config.kafka.server,
+              config.kafka.schemaRegistry,
+              HelloClientId("hello-producer-example"),
+              TopicName(config.kafka.topics.hello))
 
       }
 

@@ -15,26 +15,23 @@ object Producer {
 
   final case class Connection[F[_]] private (raw: ProducerApi[F, GenericRecord, GenericRecord]) extends AnyVal
 
-  def connection[F[_]: Async](
+  def connection[F[_]: Async, K: ToRecord, V: ToRecord](
       broker: BrokerAddress,
       schemaRegistry: SchemaRegistry,
-      clientId: HelloClientId
-  ): Resource[F, Connection[F]] =
+      clientId: HelloClientId,
+      topicName: TopicName
+  ): Resource[F, Producer[F, Message[K, V]]] =
     ProducerApi.Avro.Generic
       .resource[F](
         BootstrapServers(broker.uri),
         SchemaRegistryUrl(schemaRegistry.uri),
         ClientId(clientId.value)
       )
-      .map(Connection.apply)
+      .map(api =>
+        new Producer[F, Message[K, V]] {
+          val base = Connection.apply(api).raw.toAvro4s[K, V]
+          def sendMessage(message: Message[K, V]): F[Unit] =
+            base.sendSync(new ProducerRecord(topicName.toString, message.key, message.value)).void
+      })
 
-  def apply[F[_]: Sync, K: ToRecord, V: ToRecord](
-      connection: Connection[F],
-      topicName: TopicName
-  ): Producer[F, Message[K, V]] =
-    new Producer[F, Message[K, V]] {
-      val base = connection.raw.toAvro4s[K, V]
-      def sendMessage(message: Message[K, V]): F[Unit] =
-        base.sendSync(new ProducerRecord(topicName.toString, message.key, message.value)).void
-    }
 }
