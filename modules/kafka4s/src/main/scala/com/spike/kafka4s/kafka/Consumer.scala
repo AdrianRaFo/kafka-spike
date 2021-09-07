@@ -20,7 +20,7 @@ object Consumer {
   private[this] def toMessage[K, V]: ConsumerRecord[K, V] => Message[K, V] =
     x => Message[K, V](x.key(), x.value())
 
-  def connection[F[_]: Async: ContextShift, K: FromRecord, V: FromRecord](
+  def connection[F[_]: Async, K: FromRecord, V: FromRecord](
     broker: BrokerAddress,
     schemaRegistry: SchemaRegistry,
     clientId: HelloClientId,

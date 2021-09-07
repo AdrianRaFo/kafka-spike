@@ -1,18 +1,18 @@
 // Scala
 val log4catsV = "2.1.1"
-val kafka4sV = "3.0.0-M30"
+val kafka4sV = "4.0.0-M3"
 val fs2KafkaV = "2.2.0"
-val http4sV = "0.23.1"
+val http4sV = "0.23.3"
 val pureConfigV = "0.16.0"
-val testcontainersV = "0.39.7"
-val munitV = "0.7.27"
+val testContainersV = "0.39.7"
+val munitV = "0.7.29"
 val munitCatsEffectV = "1.0.5"
 
 // Java
 val logbackClassicV = "1.2.5"
 
 //plugins
-val kindProjectorV = "0.13.0"
+val kindProjectorV = "0.13.2"
 val bm4V = "0.3.1"
 
 val sharedSettings = Seq(
@@ -31,12 +31,12 @@ val commonDeps =
     "org.http4s"            %% "http4s-dsl"                 % http4sV,
     "org.http4s"            %% "http4s-blaze-server"        % http4sV,
     "com.github.pureconfig" %% "pureconfig"                 % pureConfigV,
-    "com.github.pureconfig" %% "pureconfig-http4s"          % pureConfigV,
     "org.scalameta"         %% "munit"                      % munitV % Test,
     "org.typelevel"         %% "munit-cats-effect-2"        % munitCatsEffectV % Test,
-    "com.dimafeng"          %% "testcontainers-scala-munit" % testcontainersV % Test,
-    "com.dimafeng"          %% "testcontainers-scala-kafka" % testcontainersV % Test
+    "com.dimafeng"          %% "testcontainers-scala-munit" % testContainersV % Test,
+    "com.dimafeng"          %% "testcontainers-scala-kafka" % testContainersV % Test
   )
+//ThisBuild / scalacOptions += "-P:semanticdb:synthetics:on"
 
 val fs2kafkaDeps = Seq("com.github.fd4s" %% "fs2-kafka-vulcan" % fs2KafkaV)
 

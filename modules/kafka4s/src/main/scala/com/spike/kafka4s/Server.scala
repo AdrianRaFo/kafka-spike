@@ -10,10 +10,10 @@ import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 object Server {
 
-  def serve[F[_]: ConcurrentEffect: ContextShift: Timer]: Stream[F, ExitCode] =
+  def serve[F[_]: Async]: Stream[F, ExitCode] =
     for {
       logger <- Stream.eval(Slf4jLogger.create[F])
-      messages <- Stream.eval(Topic.apply[F, Option[Hello.Message]](None))
+      messages <- Stream.eval(Topic.apply[F, Option[Hello.Message]])
       configService <- Stream.eval(ConfigService.impl[F])
       _ <- Stream.eval(configService.createHelloTopic(logger))
       consumer <- Stream.resource(configService.createHelloConsumer)

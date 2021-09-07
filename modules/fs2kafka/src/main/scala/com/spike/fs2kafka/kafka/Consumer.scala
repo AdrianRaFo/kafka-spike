@@ -12,7 +12,7 @@ import scala.concurrent.duration.FiniteDuration
 
 object Consumer {
 
-  def connection[F[_]: ConcurrentEffect: ContextShift: Timer, K: Codec, V: Codec](
+  def connection[F[_]: Async, K: Codec, V: Codec](
       broker: BrokerAddress,
       schemaRegistrySettings: AvroSettings[F],
       clientId: HelloClientId,

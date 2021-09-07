@@ -11,7 +11,7 @@ import com.spike.common.kafka._
 import com.spike.kafka4s.kafka.implicits._
 import com.spike.kafka4s.kafka.{Consumer, Producer}
 import org.apache.kafka.clients.admin.NewTopic
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.blaze.server.BlazeServerBuilder
 import org.typelevel.log4cats.Logger
 
 import scala.concurrent.ExecutionContext
@@ -19,7 +19,7 @@ import scala.concurrent.duration.DurationInt
 
 object ConfigService {
 
-  def impl[F[_]: ConcurrentEffect: Timer: ContextShift]: F[ConfigService[F]] =
+  def impl[F[_]: Async]: F[ConfigService[F]] =
     for {
       config <- SetupConfig.loadConfig[F]
       schemaRegistry <- SchemaRegistryApi[F](

@@ -15,22 +15,19 @@ trait HelloProducer[F[_]] {
 
 object HelloProducer {
 
-  def impl[F[_]: Concurrent: Timer](
+  def impl[F[_]: Async](
       producer: Producer[F, Message[Hello.Id, Hello.Message]],
       logger: Logger[F],
       sendMessagesEvery: FiniteDuration
   ): HelloProducer[F] = new HelloProducer[F] {
     private val recordsToBeWritten =
       Stream.fixedDelay(sendMessagesEvery) zipRight
-        Stream.repeatEval(Sync[F].delay { HelloRecord(new Date()) })
-
-    private val printMessages: Pipe[F, Message[Hello.Id, Hello.Message], Unit] =
-      _.evalMap(r => logger.info(s"[$sendMessagesEvery] $r has been sent!"))
+        Stream.repeatEval(Async[F].delay { HelloRecord(new Date()) })
 
     def sendMessages(): Stream[F, Unit] =
       recordsToBeWritten
-        .observe(printMessages)
-        .through(_.evalMap(producer.sendMessage))
+        .evalTap(r => logger.info(s"[$sendMessagesEvery] $r has been sent!"))
+        .evalMap(producer.sendMessage)
   }
 
 }

@@ -11,7 +11,7 @@ import fs2.kafka.vulcan.{avroSerializer, AvroSettings}
 
 object Producer {
 
-  def connection[F[_]: ConcurrentEffect: ContextShift, K: Codec, V: Codec](
+  def connection[F[_]: Async, K: Codec, V: Codec](
       broker: BrokerAddress,
       schemaRegistrySettings: AvroSettings[F],
       clientId: HelloClientId,

@@ -11,7 +11,7 @@ import fs2.kafka.vulcan.{AvroSettings, SchemaRegistryClientSettings}
 import fs2.kafka.{AdminClientSettings, KafkaAdminClient}
 import org.apache.kafka.clients.admin.NewTopic
 import org.apache.kafka.common.errors.TopicExistsException
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.blaze.server.BlazeServerBuilder
 import org.typelevel.log4cats.Logger
 
 import scala.concurrent.ExecutionContext
@@ -19,7 +19,7 @@ import scala.concurrent.duration.DurationInt
 
 object ConfigService {
 
-  def impl[F[_]: ConcurrentEffect: Timer: ContextShift]: F[ConfigService[F]] =
+  def impl[F[_]: Async]: F[ConfigService[F]] =
     for {
       config <- SetupConfig.loadConfig[F]
       schemaRegistry <- SchemaRegistryClientSettings[F](config.kafka.schemaRegistry.uri.toString())
@@ -33,8 +33,7 @@ object ConfigService {
           BlazeServerBuilder[F](ExecutionContext.global).bindHttp(config.http.port, config.http.host)
 
         def createHelloTopic(logger: Logger[F]): F[String] = {
-          val adminClientSettings: AdminClientSettings[F] =
-            AdminClientSettings[F].withBootstrapServers(config.kafka.server.uri.toString())
+          val adminClientSettings: AdminClientSettings = AdminClientSettings(config.kafka.server.uri.toString())
 
           KafkaAdminClient.resource(adminClientSettings).use {
             _.createTopic(new NewTopic(config.kafka.topics.hello, 1, 1.toShort))

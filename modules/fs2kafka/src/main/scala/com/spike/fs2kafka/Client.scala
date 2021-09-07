@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 
 object Client {
 
-  def produce[F[_]: ConcurrentEffect: ContextShift: Timer]: Stream[F, Unit] =
+  def produce[F[_]: Async]: Stream[F, Unit] =
     for {
       logger <- Stream.eval(Slf4jLogger.create[F])
       configService <- Stream.eval(ConfigService.impl[F])
