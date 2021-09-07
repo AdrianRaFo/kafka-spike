@@ -40,7 +40,7 @@ trait KafkaBaseSuite extends CatsEffectSuite with TestContainersForAll {
         Map[String, String](
           "KAFKA_BROKER_ID" -> brokerId.toString,
           "KAFKA_HOST_NAME" -> hostName,
-          "KAFKA_AUTO_CREATE_TOPICS_ENABLE" -> "false" //there is some issue with this setting
+          "KAFKA_AUTO_CREATE_TOPICS_ENABLE" -> "false"
         ).asJava
       )
     kafkaContainer.start
