@@ -1,15 +1,15 @@
 // Scala
-val log4catsV = "1.3.1"
+val log4catsV = "2.1.1"
 val kafka4sV = "3.0.0-M30"
-val fs2KafkaV = "1.7.0"
-val http4sV = "0.21.24"
+val fs2KafkaV = "2.2.0"
+val http4sV = "0.23.1"
 val pureConfigV = "0.16.0"
-val testcontainersV = "0.39.5"
-val munitV = "0.7.20"
-val munitCatsEffectV = "0.13.0"
+val testcontainersV = "0.39.7"
+val munitV = "0.7.27"
+val munitCatsEffectV = "1.0.5"
 
 // Java
-val logbackClassicV = "1.2.3"
+val logbackClassicV = "1.2.5"
 
 //plugins
 val kindProjectorV = "0.13.0"
