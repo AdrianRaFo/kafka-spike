@@ -32,7 +32,7 @@ val commonDeps =
     "org.http4s"            %% "http4s-blaze-server"        % http4sV,
     "com.github.pureconfig" %% "pureconfig"                 % pureConfigV,
     "org.scalameta"         %% "munit"                      % munitV % Test,
-    "org.typelevel"         %% "munit-cats-effect-2"        % munitCatsEffectV % Test,
+    "org.typelevel"         %% "munit-cats-effect-3"        % munitCatsEffectV % Test,
     "com.dimafeng"          %% "testcontainers-scala-munit" % testContainersV % Test,
     "com.dimafeng"          %% "testcontainers-scala-kafka" % testContainersV % Test
   )

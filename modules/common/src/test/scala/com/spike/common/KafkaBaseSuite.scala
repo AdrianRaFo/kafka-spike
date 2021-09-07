@@ -17,6 +17,9 @@ trait KafkaBaseSuite extends CatsEffectSuite with TestContainersForAll {
   //this should be the same version that your lib is using under the hood
   val kafkaVersion = "6.1.1"
 
+  val brokerId = 1
+  val hostName = s"kafka$brokerId"
+
   def getKafkaAddress: BrokerAddress = withContainers {
     case kafkaContainer and _ => BrokerAddress(Uri.unsafeFromString(kafkaContainer.bootstrapServers))
   }
@@ -35,6 +38,8 @@ trait KafkaBaseSuite extends CatsEffectSuite with TestContainersForAll {
       .withNetworkAliases(hostName)
       .withEnv(
         Map[String, String](
+          "KAFKA_BROKER_ID" -> brokerId.toString,
+          "KAFKA_HOST_NAME" -> hostName,
           "KAFKA_AUTO_CREATE_TOPICS_ENABLE" -> "false" //there is some issue with this setting
         ).asJava
       )
