@@ -22,7 +22,7 @@ object Producer {
       ProducerSettings[F, K, V](
         avroSerializer[K].using(schemaRegistrySettings),
         avroSerializer[V].using(schemaRegistrySettings))
-        .withBootstrapServers(broker.uri)
+        .withBootstrapServers(broker.uri.toString())
         .withClientId(clientId.value)
 
     KafkaProducer

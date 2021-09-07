@@ -10,7 +10,6 @@ import com.spike.common.hello._
 import com.spike.common.kafka._
 import com.spike.kafka4s.kafka.implicits._
 import com.spike.kafka4s.kafka.{Consumer, Producer}
-import fs2.concurrent.Topic
 import org.apache.kafka.clients.admin.NewTopic
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.typelevel.log4cats.Logger
@@ -24,7 +23,7 @@ object ConfigService {
     for {
       config <- SetupConfig.loadConfig[F]
       schemaRegistry <- SchemaRegistryApi[F](
-        config.kafka.schemaRegistry.uri,
+        config.kafka.schemaRegistry.uri.toString(),
         config.kafka.schemaRegistry.cachedSchemasPerSubject)
     } yield
       new ConfigService[F] {
@@ -37,24 +36,23 @@ object ConfigService {
 
           for {
             _ <- AdminApi
-              .createTopicsIdempotent[F](config.kafka.server.uri, new NewTopic(topicName.toString, 1, 1.toShort) :: Nil)
+              .createTopicsIdempotent[F](
+                config.kafka.server.uri.toString(),
+                new NewTopic(topicName.toString, 1, 1.toShort) :: Nil)
               .void
             _ <- schemaRegistry.registerKey[Hello.Id](topicName.toString)
             _ <- schemaRegistry.registerValue[Hello.Message](topicName.toString)
           } yield topicName.toString
         }
 
-        def createHelloConsumer(
-            logger: Logger[F],
-            messages: Topic[F, Option[Hello.Message]]): Resource[F, Consumer[F, Hello]] =
+        def createHelloConsumer: Resource[F, Consumer[F, Message[Hello.Id, Hello.Message]]] =
           Consumer
             .connection[F, Hello.Id, Hello.Message](
               config.kafka.server,
               config.kafka.schemaRegistry,
               HelloClientId("hello-consumer-example"),
               HelloGroupId("hello-consumer-example-group"))
-            .map(Consumer.atLeastOnce(_, TopicName(config.kafka.topics.hello), 1.second)(
-              HelloConsumer.impl[F](logger, messages)))
+            .map(Consumer.atLeastOnce(_, TopicName(config.kafka.topics.hello), 1.second))
 
         def createHelloProducer: Resource[F, Producer[F, Message[Hello.Id, Hello.Message]]] =
           Producer

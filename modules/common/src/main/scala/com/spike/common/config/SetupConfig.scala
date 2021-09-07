@@ -4,6 +4,7 @@ import cats.effect._
 import com.typesafe.config.ConfigFactory
 import pureconfig._
 import pureconfig.generic.auto._
+import pureconfig.module.http4s._
 
 import java.util.concurrent._
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}

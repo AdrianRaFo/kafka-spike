@@ -1,12 +1,21 @@
 package com.spike.common.config
 
-final case class SchemaRegistry(host: String, port: Int, cachedSchemasPerSubject: Int) {
-  def uri = s"http://$host:$port"
+import org.http4s.{ParseFailure, Uri}
+
+final case class SchemaRegistry(uri: Uri, cachedSchemasPerSubject: Int)
+
+object SchemaRegistry {
+  def apply(host: String, port: Int, cachedSchemasPerSubject: Int): Either[ParseFailure, SchemaRegistry] =
+    Uri.fromString(s"$host:$port").map(new SchemaRegistry(_, cachedSchemasPerSubject))
 }
 
-final case class BrokerAddress(host: String, port: Int) {
-  def uri = s"http://$host:$port"
+final case class BrokerAddress(uri: Uri)
+
+object BrokerAddress {
+  def apply(host: String, port: Int): Either[ParseFailure, BrokerAddress] =
+    Uri.fromString(s"$host:$port").map(new BrokerAddress(_))
 }
+
 case class ServiceConfig(kafka: KafkaConfig, http: HttpConfig)
 
 case class HttpConfig(host: String, port: Int)

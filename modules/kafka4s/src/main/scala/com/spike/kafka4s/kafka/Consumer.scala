@@ -1,7 +1,7 @@
 package com.spike.kafka4s.kafka
 
-import cats.data.Kleisli
 import cats.effect._
+import cats.implicits.catsSyntaxApplicativeId
 import com.banno.kafka._
 import com.banno.kafka.consumer._
 import com.sksamuel.avro4s.FromRecord
@@ -28,8 +28,8 @@ object Consumer {
     autocommit: Boolean = false): Resource[F, Connection[F, K, V]] =
     ConsumerApi.Avro4s
       .resource[F, K, V](
-        BootstrapServers(broker.uri),
-        SchemaRegistryUrl(schemaRegistry.uri),
+        BootstrapServers(broker.uri.toString()),
+        SchemaRegistryUrl(schemaRegistry.uri.toString()),
         ClientId(clientId.value),
         GroupId(groupId.value),
         EnableAutoCommit(autocommit)
@@ -49,13 +49,12 @@ object Consumer {
           .map(toMessage)
     }
 
-  def atLeastOnce[F[_]: Sync, K, V, A](connection: Connection[F, K, V], topicName: TopicName, pollTime: FiniteDuration)(
-      handle: Kleisli[F, Message[K, V], A]): Consumer[F, A] =
-    new Consumer[F, A] {
-      def deliveredMessages: Stream[F, A] =
+  def atLeastOnce[F[_]: Sync, K, V, A](connection: Connection[F, K, V], topicName: TopicName, pollTime: FiniteDuration): Consumer[F, Message[K, V]] =
+    new Consumer[F, Message[K, V]] {
+      def deliveredMessages: Stream[F, Message[K, V]] =
         Stream
           .eval(connection.raw.subscribe(topicName.toString)) >> connection.raw
-          .readProcessCommit(pollTime)(x => handle(toMessage(x)))
+          .readProcessCommit(pollTime)(x => toMessage(x).pure[F])
     }
 
 }

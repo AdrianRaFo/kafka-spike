@@ -16,12 +16,13 @@ object Server {
       messages <- Stream.eval(Topic.apply[F, Option[Hello.Message]](None))
       configService <- Stream.eval(ConfigService.impl[F])
       _ <- Stream.eval(configService.createHelloTopic(logger))
-      consumer <- Stream.resource(configService.createHelloConsumer(logger, messages))
+      consumer <- Stream.resource(configService.createHelloConsumer)
+      consumerMapper = HelloConsumer.impl(logger, messages)
       _ <- Stream.eval(logger.info("Kafka Spike Server Has Started Successfully"))
       exitCode <- configService.primaryHttpServer
         .withHttpApp(new HelloService[F].routes(messages).orNotFound)
         .serve
-        .concurrently(consumer.deliveredMessages)
+        .concurrently(consumer.deliveredMessages.evalMap(consumerMapper(_)))
     } yield exitCode
 
 }
