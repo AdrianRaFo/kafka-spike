@@ -12,11 +12,11 @@ object HelloConsumer {
   def impl[F[_]: Sync](
       logger: Logger[F],
       output: Topic[F, Option[Hello.Message]]
-  ): Kleisli[F, Message[Hello.Id, Hello.Message], Hello] = Kleisli { Message =>
+  ): Kleisli[F, Message[Hello.Id, Hello.Message], Hello] = Kleisli { message =>
     for {
-      _ <- logger.info(s"Receiving ${Message}")
-      _ <- output.publish1(Message.value.value.headOption.map(_ => Message.value))
-    } yield Hello(Message.key, Message.value)
+      _ <- logger.info(s"Receiving $message")
+      _ <- output.publish1(message.value.value.headOption.map(_ => message.value))
+    } yield Hello(message.key, message.value)
   }
 
 }

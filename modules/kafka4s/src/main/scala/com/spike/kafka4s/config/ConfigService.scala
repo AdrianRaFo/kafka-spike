@@ -23,7 +23,7 @@ object ConfigService {
     for {
       config <- SetupConfig.loadConfig[F]
       schemaRegistry <- SchemaRegistryApi[F](
-        config.kafka.schemaRegistry.uri.toString(),
+        config.kafka.schemaRegistry.uri,
         config.kafka.schemaRegistry.cachedSchemasPerSubject)
     } yield
       new ConfigService[F] {
@@ -37,7 +37,7 @@ object ConfigService {
           for {
             _ <- AdminApi
               .createTopicsIdempotent[F](
-                config.kafka.server.uri.toString(),
+                config.kafka.server.uri,
                 new NewTopic(topicName.toString, 1, 1.toShort) :: Nil)
               .void
             _ <- schemaRegistry.registerKey[Hello.Id](topicName.toString)

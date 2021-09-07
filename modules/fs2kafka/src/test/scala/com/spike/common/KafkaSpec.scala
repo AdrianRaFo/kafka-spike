@@ -22,7 +22,7 @@ class KafkaSpec extends KafkaBaseSuite {
   val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
   def createTopic: IO[Unit] = {
-    val adminClientSettings: AdminClientSettings = AdminClientSettings(getKafkaAddress.uri.toString())
+    val adminClientSettings: AdminClientSettings = AdminClientSettings(getKafkaAddress.uri)
 
     KafkaAdminClient.resource[IO](adminClientSettings).use {
       _.createTopic(new NewTopic(topic, 1, 1.toShort)).recoverWith {

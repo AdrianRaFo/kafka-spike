@@ -23,8 +23,8 @@ object Producer {
   ): Resource[F, Producer[F, Message[K, V]]] =
     ProducerApi.Avro.Generic
       .resource[F](
-        BootstrapServers(broker.uri.toString()),
-        SchemaRegistryUrl(schemaRegistry.uri.toString()),
+        BootstrapServers(broker.uri),
+        SchemaRegistryUrl(schemaRegistry.uri),
         ClientId(clientId.value)
       )
       .map(api =>

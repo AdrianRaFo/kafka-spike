@@ -22,7 +22,7 @@ object ConfigService {
   def impl[F[_]: Async]: F[ConfigService[F]] =
     for {
       config <- SetupConfig.loadConfig[F]
-      schemaRegistry <- SchemaRegistryClientSettings[F](config.kafka.schemaRegistry.uri.toString())
+      schemaRegistry <- SchemaRegistryClientSettings[F](config.kafka.schemaRegistry.uri)
         .withMaxCacheSize(config.kafka.schemaRegistry.cachedSchemasPerSubject)
         .createSchemaRegistryClient
         .map(AvroSettings(_))
@@ -33,7 +33,7 @@ object ConfigService {
           BlazeServerBuilder[F](ExecutionContext.global).bindHttp(config.http.port, config.http.host)
 
         def createHelloTopic(logger: Logger[F]): F[String] = {
-          val adminClientSettings: AdminClientSettings = AdminClientSettings(config.kafka.server.uri.toString())
+          val adminClientSettings: AdminClientSettings = AdminClientSettings(config.kafka.server.uri)
 
           KafkaAdminClient.resource(adminClientSettings).use {
             _.createTopic(new NewTopic(config.kafka.topics.hello, 1, 1.toShort))

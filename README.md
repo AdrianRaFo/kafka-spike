@@ -34,7 +34,7 @@ The producer is **thread safe** and **sharing a single producer instance** acros
 
 #### Partition
 
-If a valid partition number is specified that partition will be used when sending the record. If no partition is specified but a key is present a partition will be chosen using a hash of the key. **If neither key nor partition is present a partition will be assigned in a round-robin fashion**.
+If a valid partition number is specified that partition will be used when sending the record. If no partition is specified but a key is present a partition will be chosen by using a hash of the key. **If neither key nor partition is present a partition will be assigned in a round-robin fashion**.
 
 #### Same *client id* for producers
 
@@ -52,7 +52,7 @@ The main way consumers can **lose messages** is when committing offsets for even
 
 Consumers can create throughput issues on the other side of the pipeline. **The maximum number of consumers for a topic is equal to the number of partitions**. You require enough partitions to handle all the consumers needed to keep up with the producers.
 
-This is a good reason to create **topics with a large number of partitions**, it allows adding more consumers when the load increases. Keep in mind that **there is no point in adding more consumers than you have partitions in a topic**, some of the consumers will just be idle.
+This is a good reason to create **topics with a large number of partitions**, it allows adding more consumers when the load increases. Keep in mind that **there is no point in adding more consumers than you have partitions in a topic**, some consumers will just be idle.
 
 It is very common to have **multiple applications that need to read data from the same topic**. To make sure an application gets all the messages in a topic, **ensure the application has its own consumer group**.
 

@@ -24,7 +24,7 @@ object Consumer {
       ConsumerSettings[F, K, V](
         avroDeserializer[K].using(schemaRegistrySettings),
         avroDeserializer[V].using(schemaRegistrySettings))
-        .withBootstrapServers(broker.uri.toString())
+        .withBootstrapServers(broker.uri)
         .withAutoOffsetReset(AutoOffsetReset.Earliest)
         .withClientId(clientId.value)
         .withGroupId(groupId.value)

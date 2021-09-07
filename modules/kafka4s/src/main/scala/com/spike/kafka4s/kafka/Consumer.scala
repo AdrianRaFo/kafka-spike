@@ -28,8 +28,8 @@ object Consumer {
     autocommit: Boolean = false): Resource[F, Connection[F, K, V]] =
     ConsumerApi.Avro4s
       .resource[F, K, V](
-        BootstrapServers(broker.uri.toString()),
-        SchemaRegistryUrl(schemaRegistry.uri.toString()),
+        BootstrapServers(broker.uri),
+        SchemaRegistryUrl(schemaRegistry.uri),
         ClientId(clientId.value),
         GroupId(groupId.value),
         EnableAutoCommit(autocommit)
