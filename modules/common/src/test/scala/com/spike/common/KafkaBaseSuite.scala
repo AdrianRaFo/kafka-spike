@@ -11,7 +11,7 @@ import scala.jdk.CollectionConverters._
 
 trait KafkaBaseSuite extends CatsEffectSuite with TestContainersForAll {
 
-  override type Containers = KafkaContainer and GenericContainer
+  override type Containers = KafkaContainer and SchemaRegistryContainer
 
   //this should be the same version that your lib is using under the hood
   val kafkaVersion = "6.1.1"
@@ -26,8 +26,7 @@ trait KafkaBaseSuite extends CatsEffectSuite with TestContainersForAll {
   }
 
   def getSchemaRegistryAddress: String = withContainers {
-    case _ and schemaRegistryContainer =>
-      s"http://${schemaRegistryContainer.container.getHost}:${schemaRegistryContainer.container.getMappedPort(SchemaRegistryContainer.defaultSchemaPort)}"
+    case _ and schemaRegistryContainer => schemaRegistryContainer.schemaUrl
   }
 
   override def startContainers(): Containers = {
@@ -47,7 +46,8 @@ trait KafkaBaseSuite extends CatsEffectSuite with TestContainersForAll {
       )
     kafkaContainer.start
 
-    val schemaRegistryContainer: GenericContainer = SchemaRegistryContainer.Def(network, hostName, kafkaVersion).start()
+    val schemaRegistryContainer: SchemaRegistryContainer =
+      SchemaRegistryContainer.Def(network, hostName, kafkaVersion).start()
 
     kafkaContainer and schemaRegistryContainer
   }
