@@ -36,9 +36,7 @@ object ConfigService {
 
           for {
             _ <- AdminApi
-              .createTopicsIdempotent[F](
-                config.kafka.server.uri,
-                new NewTopic(topicName.toString, 1, 1.toShort) :: Nil)
+              .createTopicsIdempotent[F](config.kafka.server.uri, new NewTopic(topicName.toString, 1, 1.toShort) :: Nil)
               .void
             _ <- schemaRegistry.registerKey[Hello.Id](topicName.toString)
             _ <- schemaRegistry.registerValue[Hello.Message](topicName.toString)
@@ -50,7 +48,7 @@ object ConfigService {
             .connection[F, Hello.Id, Hello.Message](
               config.kafka.server,
               config.kafka.schemaRegistry,
-              HelloClientId("hello-consumer-example"),
+              SetupConfig.createKafkaClientId("hello-consumer-example"),
               HelloGroupId("hello-consumer-example-group"))
             .map(Consumer.atLeastOnce(_, TopicName(config.kafka.topics.hello), 1.second))
 
@@ -59,7 +57,7 @@ object ConfigService {
             .connection[F, Hello.Id, Hello.Message](
               config.kafka.server,
               config.kafka.schemaRegistry,
-              HelloClientId("hello-producer-example"),
+              SetupConfig.createKafkaClientId("hello-producer-example"),
               TopicName(config.kafka.topics.hello))
 
       }

@@ -48,6 +48,7 @@ trait KafkaBaseSuite extends CatsEffectSuite with TestContainersForAll {
     kafkaContainer.start
 
     val schemaRegistryContainer: GenericContainer = SchemaRegistryContainer.Def(network, hostName, kafkaVersion).start()
+
     kafkaContainer and schemaRegistryContainer
   }
 

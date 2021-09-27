@@ -21,11 +21,11 @@ object Consumer {
     x => Message[K, V](x.key(), x.value())
 
   def connection[F[_]: Async, K: FromRecord, V: FromRecord](
-    broker: BrokerAddress,
-    schemaRegistry: SchemaRegistry,
-    clientId: HelloClientId,
-    groupId: HelloGroupId,
-    autocommit: Boolean = false): Resource[F, Connection[F, K, V]] =
+      broker: BrokerAddress,
+      schemaRegistry: SchemaRegistry,
+      clientId: HelloClientId,
+      groupId: HelloGroupId,
+      autocommit: Boolean = false): Resource[F, Connection[F, K, V]] =
     ConsumerApi.Avro4s
       .resource[F, K, V](
         BootstrapServers(broker.uri),
@@ -49,7 +49,10 @@ object Consumer {
           .map(toMessage)
     }
 
-  def atLeastOnce[F[_]: Sync, K, V, A](connection: Connection[F, K, V], topicName: TopicName, pollTime: FiniteDuration): Consumer[F, Message[K, V]] =
+  def atLeastOnce[F[_]: Sync, K, V, A](
+      connection: Connection[F, K, V],
+      topicName: TopicName,
+      pollTime: FiniteDuration): Consumer[F, Message[K, V]] =
     new Consumer[F, Message[K, V]] {
       def deliveredMessages: Stream[F, Message[K, V]] =
         Stream

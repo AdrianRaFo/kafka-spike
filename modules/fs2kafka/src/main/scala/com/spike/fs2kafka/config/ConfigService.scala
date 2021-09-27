@@ -49,7 +49,7 @@ object ConfigService {
             .connection[F, Hello.Id, Hello.Message](
               config.kafka.server,
               schemaRegistry,
-              HelloClientId("hello-consumer-example"),
+              SetupConfig.createKafkaClientId("hello-consumer-example"),
               HelloGroupId("hello-consumer-example-group"),
               config.kafka.topics.hello,
               1.second
@@ -60,7 +60,7 @@ object ConfigService {
             .connection[F, Hello.Id, Hello.Message](
               config.kafka.server,
               schemaRegistry,
-              HelloClientId("hello-producer-example"),
+              SetupConfig.createKafkaClientId("hello-producer-example"),
               config.kafka.topics.hello,
             )
 

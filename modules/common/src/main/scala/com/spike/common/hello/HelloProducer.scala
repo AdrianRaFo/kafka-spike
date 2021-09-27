@@ -20,9 +20,10 @@ object HelloProducer {
       logger: Logger[F],
       sendMessagesEvery: FiniteDuration
   ): HelloProducer[F] = new HelloProducer[F] {
+
     private val recordsToBeWritten =
       Stream.fixedDelay(sendMessagesEvery) zipRight
-        Stream.repeatEval(Async[F].delay { HelloRecord(new Date()) })
+        Stream.repeatEval(Async[F].delay { buildMessage(new Date()) })
 
     def sendMessages(): Stream[F, Unit] =
       recordsToBeWritten
@@ -30,11 +31,7 @@ object HelloProducer {
         .evalMap(producer.sendMessage)
   }
 
-}
-
-object HelloRecord {
-
-  def apply(date: Date): Message[Hello.Id, Hello.Message] =
+  private def buildMessage(date: Date): Message[Hello.Id, Hello.Message] =
     Message(
       Hello.Id(date.getTime.show),
       Hello.Message(s"Hello ${nameFrom(date)}!", date.getTime)
