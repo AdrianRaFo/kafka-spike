@@ -4,7 +4,7 @@ val kafka4sV = "4.0.0-M3"
 val fs2KafkaV = "2.2.0"
 val http4sV = "0.23.3"
 val pureConfigV = "0.16.0"
-val testContainersV = "0.39.7"
+val testContainersV = "0.39.8"
 val munitV = "0.7.29"
 val munitCatsEffectV = "1.0.5"
 

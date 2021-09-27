@@ -1,7 +1,7 @@
 package com.spike.common
 
 import com.dimafeng.testcontainers.lifecycle.and
-import com.dimafeng.testcontainers.{GenericContainer, KafkaContainer}
+import com.dimafeng.testcontainers.{GenericContainer, KafkaContainer, SchemaRegistryContainer}
 import com.dimafeng.testcontainers.munit.TestContainersForAll
 import com.spike.common.config.BrokerAddress
 import munit.CatsEffectSuite
