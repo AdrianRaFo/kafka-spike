@@ -115,8 +115,7 @@ This parameter controls what the consumer will do when no offsets are committed
 (e.g., when the consumer first starts) or when the consumer asks for offsets that don't exist in the broker.
 
 - **earliest**, the consumer will start from the beginning of the partition whenever
-
-- it doesn't have a valid offset. This can lead to the consumer processing a lot of messages twice, 
+  it doesn't have a valid offset. This can lead to the consumer processing a lot of messages twice, 
   but it guarantees to minimize data loss.
 
 - **latest** the consumer will start at the end of the partition. 
