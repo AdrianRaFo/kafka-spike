@@ -1,19 +1,18 @@
-package com.spike.kafka4s
+package com.spike.common
 
-import cats.effect._
+import cats.effect.Async
+import com.spike.common.config.ConfigService
 import com.spike.common.hello.HelloProducer
-import com.spike.kafka4s.config.ConfigService
-import fs2._
+import fs2.Stream
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.DurationInt
 
 object Client {
 
-  def produce[F[_]: Async]: Stream[F, Unit] =
+  def produce[F[_]: Async](configService: ConfigService[F]): Stream[F, Unit] =
     for {
       logger <- Stream.eval(Slf4jLogger.create[F])
-      configService <- Stream.eval(ConfigService.impl[F])
       _ <- Stream.eval(configService.createHelloTopic(logger))
       producer <- Stream.resource(configService.createHelloProducer)
       // anotherProducer <- Stream.resource(configService.helloProducer)
