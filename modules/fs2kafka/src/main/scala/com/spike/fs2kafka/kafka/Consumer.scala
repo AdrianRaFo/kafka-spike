@@ -22,8 +22,8 @@ object Consumer {
 
     val consumerSettings =
       ConsumerSettings[F, K, V](
-        avroDeserializer[K].using(schemaRegistrySettings),
-        avroDeserializer[V].using(schemaRegistrySettings))
+        avroDeserializer[K].forKey(schemaRegistrySettings),
+        avroDeserializer[V].forValue(schemaRegistrySettings))
         .withBootstrapServers(broker.uri)
         .withAutoOffsetReset(AutoOffsetReset.Earliest)
         .withClientId(clientId.value)

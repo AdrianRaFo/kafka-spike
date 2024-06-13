@@ -20,8 +20,8 @@ object Producer {
 
     val producerSettings =
       ProducerSettings[F, K, V](
-        avroSerializer[K].using(schemaRegistrySettings),
-        avroSerializer[V].using(schemaRegistrySettings))
+        avroSerializer[K].forKey(schemaRegistrySettings),
+        avroSerializer[V].forValue(schemaRegistrySettings))
         .withBootstrapServers(broker.uri)
         .withClientId(clientId.value)
 
