@@ -176,7 +176,7 @@ Run consumer and http server
 
 using kafka4s
 ```sh
-  > sbt kafka4s/run
+  > sbt fs2kafka/run
 ```
 
 
